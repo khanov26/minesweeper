@@ -42,7 +42,12 @@ import { GameLevel } from './types/GameLevel';
 import AppHeader from './components/Header.vue';
 import Field from './components/Field.vue';
 import { FieldSize } from './types/FieldSize';
-import { generateMap, openAllMines, openCell } from './utils/field';
+import {
+  generateEmptyMap,
+  generateMap,
+  openAllMines,
+  openCell,
+} from './utils/field';
 import { Cell } from './types/Cell';
 import Popup from './components/UI/Popup.vue';
 import BombAudioSrc from './assets/bomb.mp3';
@@ -69,6 +74,7 @@ export default defineComponent({
       mute: false,
       map: [] as Cell[][],
       showPopup: false,
+      isGameStart: true,
     };
   },
   computed: {
@@ -124,13 +130,13 @@ export default defineComponent({
           this.minesCount = 99;
           break;
       }
-      this.map = generateMap(this.fieldSize, this.minesCount);
+      this.resetTimer();
+      this.map = generateEmptyMap(this.fieldSize);
+      this.isGameStart = true;
       this.showPopup = false;
-      this.startTimer();
     },
     startTimer() {
-      clearInterval(this.timer);
-      this.seconds = 0;
+      this.resetTimer();
 
       this.timer = setInterval(() => {
         if (this.seconds < 999) {
@@ -140,9 +146,19 @@ export default defineComponent({
         }
       }, 1000);
     },
+    resetTimer() {
+      clearInterval(this.timer);
+      this.seconds = 0;
+    },
     onOpenCell(cell: Cell) {
-      if (this.gameOver || cell.marked) {
+      if (cell.marked || this.gameOver || this.won) {
         return;
+      }
+
+      if (this.isGameStart) {
+        this.map = generateMap(this.fieldSize, this.minesCount, cell);
+        this.isGameStart = false;
+        this.startTimer();
       }
 
       if (!this.mute) {
@@ -165,7 +181,7 @@ export default defineComponent({
       if (!this.mute) {
         flagAudio.play();
       }
-      
+
       if (cell.marked) {
         cell.marked = false;
         this.minesCount++;
