@@ -1,7 +1,7 @@
 <template>
   <div class="app-select">
     <div class="app-select__value" @click="open = !open">
-      <span class="app-select__value-text">{{ options[value] }}</span>
+      <span class="app-select__value-text">{{ options[modelValue] }}</span>
       <img
         src="../../assets/down-arrow.png"
         alt="arrow-down"
@@ -30,20 +30,20 @@ export default defineComponent({
       type: Object as PropType<Record<string, number | string>>,
       required: true,
     },
-    value: {
+    modelValue: {
       type: [String],
       required: true,
     },
   },
-  emits: ['change'],
+  emits: ['update:modelValue'],
   data() {
     return {
       open: false,
     }
   },
   methods: {
-    onOptionSelect(option) {
-      this.$emit('change', option);
+    onOptionSelect(option: string) {
+      this.$emit('update:modelValue', option);
       this.open = false;
     },
   },

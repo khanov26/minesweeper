@@ -2,9 +2,8 @@
   <div class="header">
     <div class="header__item header__item--left">
       <app-select
-        :value="level"
+        v-model="level"
         :options="gameLevelLabels"
-        @change="onLevelChange"
       ></app-select>
     </div>
 
@@ -21,7 +20,7 @@
     </div>
 
     <div class="header__item header__item--right">
-      <div class="volume" @click="$emit('changeMute')">
+      <div class="volume" @click="$emit('update:mute', !mute)">
         <img v-if="mute" src="../assets/mute.png" alt="volume" class="volume__img" />
         <img v-else src="../assets/volume.png" alt="volume" class="volume__img" />
       </div>
@@ -39,7 +38,7 @@ export default defineComponent({
     AppSelect,
   },
   props: {
-    level: {
+    gameLevel: {
       type: String as PropType<GameLevel>,
       required: true,
     },
@@ -56,18 +55,22 @@ export default defineComponent({
       required: true,
     }
   },
-  emits: ['changeLevel', 'changeMute'],
-  methods: {
-    onLevelChange(value: GameLevel) {
-      this.$emit('changeLevel', value);
+  computed: {
+    level: {
+      get() {
+        return this.gameLevel;
+      },
+      set(value: string) {
+        this.$emit('update:gameLevel', value);
+      },
     },
   },
-  created() {
-    this.gameLevelLabels = {
-      [GameLevel.easy]: 'Простой',
-      [GameLevel.medium]: 'Средний',
-      [GameLevel.hard]: 'Сложный',
-    };
+  inject: ['gameLevelLabels'],
+  emits: ['update:gameLevel', 'update:mute'],
+  methods: {
+    onLevelChange(value: GameLevel) {
+      this.$emit('changeGameLevel', value);
+    },
   },
 });
 </script>

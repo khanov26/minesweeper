@@ -44,7 +44,7 @@ export default defineComponent({
       required: true,
     },
     map: {
-      type: Array as PropType<CellType[]>,
+      type: Array as PropType<CellType[][]>,
       required: true,
     },
   },

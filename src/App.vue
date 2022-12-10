@@ -1,11 +1,9 @@
 <template>
   <app-header
-    :level="gameLevel"
-    @change-level="onChangeLevel"
     :mines-count="minesCount"
     :seconds="seconds"
-    :mute="mute"
-    @change-mute="mute = !mute"
+    v-model:game-level="gameLevel"
+    v-model:mute="mute"
   ></app-header>
 
   <field
@@ -114,8 +112,17 @@ export default defineComponent({
       return true;
     },
   },
+  provide() {
+    return {
+      gameLevelLabels: {
+        [GameLevel.easy]: 'Простой',
+        [GameLevel.medium]: 'Средний',
+        [GameLevel.hard]: 'Сложный',
+      },
+    }
+  },
   methods: {
-    onChangeLevel(level: GameLevel) {
+    onChangeGameLevel(level: GameLevel) {
       this.gameLevel = level;
     },
     startGame() {
@@ -151,7 +158,7 @@ export default defineComponent({
       this.seconds = 0;
     },
     onOpenCell(cell: Cell) {
-      if (cell.marked || this.gameOver || this.won) {
+      if (cell.open || cell.marked || this.gameOver || this.won) {
         return;
       }
 
